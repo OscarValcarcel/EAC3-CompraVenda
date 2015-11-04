@@ -3,8 +3,6 @@ package com.example.oscarvalcarcel.eac3_compravenda;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -42,14 +40,7 @@ public class Afegir extends AppCompatActivity {
             }
         });
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
@@ -78,26 +69,7 @@ public class Afegir extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-/*    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        switch (requestCode) {
-            case GlobalConstants.IMAGE_CAPTURE:
-                Uri u;
-                if (hasImageCaptureBug()) {
-                    File fi = new File("/sdcard/tmp");
-                    try {
-                        u = Uri.parse(android.provider.MediaStore.Images.Media.insertImage(getContentResolver(), fi.getAbsolutePath(), null, null));
-                        if (!fi.delete()) {
-                            Log.i("logMarker", "Failed to delete " + fi);
-                        }
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    u = intent.getData();
-                }
-        }
 
-    }*/
 @Override
 protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
