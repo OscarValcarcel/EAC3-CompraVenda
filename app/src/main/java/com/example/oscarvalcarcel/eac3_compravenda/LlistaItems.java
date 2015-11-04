@@ -23,8 +23,7 @@ public class LlistaItems extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                //         .setAction("Action", null).show();
+                //Cridem al mètode que crida a l'activitat per afegir articles
                 cridaAfegir();
             }
 
