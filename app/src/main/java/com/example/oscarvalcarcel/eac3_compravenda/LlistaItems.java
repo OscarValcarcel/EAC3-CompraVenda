@@ -23,7 +23,7 @@ public class LlistaItems extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Cridem al mètode que crida a l'activitat per afegir articles
+                //Cride al mètode que crida a l'activitat per afegir articles
                 cridaAfegir();
             }
 
