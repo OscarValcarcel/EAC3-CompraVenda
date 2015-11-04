@@ -31,7 +31,6 @@ public class LlistaItems extends AppCompatActivity {
 
         });
 
-        //SimpleAdapter adapter = new SimpleAdapter()
         listView = (ListView) findViewById(R.id.listView);
     }
 

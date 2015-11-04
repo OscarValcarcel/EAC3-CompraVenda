@@ -74,12 +74,14 @@ public class Afegir extends AppCompatActivity {
 protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
 
+    //Si tot ha sortit bé
     if (RESULT_OK == resultCode) {
-        // Get Extra from the intent
+        // Obtenim els extras
         Bundle extras = data.getExtras();
-        // Get the returned image from extra
+        // Obtenim la imatge del extra
         Bitmap bmp = (Bitmap) extras.get("data");
 
+        //La establim en el widget
         imatge = (ImageView) findViewById(R.id.imatge);
         imatge.setImageBitmap(bmp);
     }
