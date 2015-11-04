@@ -25,11 +25,11 @@ public class Afegir extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        titol = (TextView) findViewById(R.id.titol);
-        preu = (TextView) findViewById(R.id.preu);
-        imatge = (ImageView) findViewById(R.id.imatge);
+        titol = (TextView) findViewById(R.id.title);
+        preu = (TextView) findViewById(R.id.price);
+        imatge = (ImageView) findViewById(R.id.image);
 
-        setTitle("Sell item");
+        //setTitle("Sell item");
 
         imatge.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,8 +82,9 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Bitmap bmp = (Bitmap) extras.get("data");
 
         //La establim en el widget
-        imatge = (ImageView) findViewById(R.id.imatge);
+        imatge = (ImageView) findViewById(R.id.image);
         imatge.setImageBitmap(bmp);
+        //imatge.set
     }
 }
 }

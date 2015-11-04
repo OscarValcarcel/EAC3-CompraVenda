@@ -19,18 +19,22 @@ public class LlistaItems extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //Inicialitzem la listView
+        listView = (ListView) findViewById(R.id.listView);
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        //fab.setBackgroundDrawable(R.drawable.add);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Cride al mètode que crida a l'activitat per afegir articles
+                //Cridem al mètode que crida a l'activitat per afegir articles
                 cridaAfegir();
             }
 
 
         });
 
-        listView = (ListView) findViewById(R.id.listView);
+
     }
 
     public void cridaAfegir(){
