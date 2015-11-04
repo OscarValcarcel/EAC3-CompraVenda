@@ -22,7 +22,7 @@
             <ImageView
                 android:layout_width="166dp"
                 android:layout_height="match_parent"
-                android:background="@drawable/image_black"
+                android:src="@drawable/image_black"
                 android:id="@+id/imatge" />
 
             <LinearLayout
