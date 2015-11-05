@@ -84,7 +84,6 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //La establim en el widget
         imatge = (ImageView) findViewById(R.id.image);
         imatge.setImageBitmap(bmp);
-        //imatge.set
     }
 }
 }
