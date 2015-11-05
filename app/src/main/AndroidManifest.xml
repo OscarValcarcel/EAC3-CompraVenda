@@ -27,6 +27,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.oscarvalcarcel.eac3_compravenda.LlistaItems" />
         </activity>
+        <activity
+            android:name=".MostraItem"
+            android:label="@string/title_activity_mostra_item"
+            android:parentActivityName=".LlistaItems"
+            android:theme="@style/AppTheme.NoActionBar" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.oscarvalcarcel.eac3_compravenda.LlistaItems" />
+        </activity>
     </application>
 
 </manifest>
