@@ -1,6 +1,5 @@
 package com.example.oscarvalcarcel.eac3_compravenda;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,6 +9,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,9 +43,21 @@ public class Afegir extends AppCompatActivity {
         imatge.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                int imageNum = 0;
+
                 Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                File f = new File(android.os.Environment.getExternalStorageDirectory(), "Items");
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
+                File items = new File(android.os.Environment.getExternalStorageDirectory(),"Items");
+                if (!items.exists()){
+                    items.mkdir();
+                }
+
+
+                String nom_foto = "imatge.jpg";
+
+                File directori_foto = new File(items,nom_foto);
+                Log.d("Ruta", items.getAbsolutePath());
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(directori_foto));
+                //String path =   items.getAbsolutePath();
                 startActivityForResult(intent, REQ_CAMERA);
 
             }
@@ -99,7 +111,8 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
                 }
             }
 
-
+           // Uri u = intent.getData(); // this gonna give you the pic's uri
+            // you should convert this to a path (see the link below the code section
 
         /*
         // Obtenim els extras
@@ -140,13 +153,23 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
             }// else if (requestCode == SELECT_FILE) {
                 Uri selectedImageUri = data.getData();
 
+       // When you capture image, in onActivityResult() use that URI to obtain file path:
+
+        String[] projection = { MediaStore.Images.Media.DATA};
+        /*try (Cursor cursor = managedQuery(selectedImageUri, projection, null, null, null)) {
+            int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            String capturedImageFilePath = cursor.getString(column_index_data);
+        }*/
+/*
                 String tempPath = getPath(selectedImageUri, getActivity());
+                String ruta = getA
                 Bitmap bm;
                 BitmapFactory.Options btmapOptions = new BitmapFactory.Options();
                 bm = BitmapFactory.decodeFile(tempPath, btmapOptions);
                 imatge = (ImageView) findViewById(R.id.image);
                 imatge.setImageBitmap(bm);
-                uploadImagePath = tempPath;
+                uploadImagePath = tempPath;*/
 
             }
         }
