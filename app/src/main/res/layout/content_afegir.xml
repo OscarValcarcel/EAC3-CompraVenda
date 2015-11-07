@@ -22,7 +22,7 @@
             <ImageView
                 android:layout_width="150dp"
                 android:layout_height="match_parent"
-                android:id="@+id/image"
+                android:id="@+id/imatge"
                 android:background="@drawable/image_black" />
 
             <LinearLayout
@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/title"
+                    android:id="@+id/titol"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Title" />
@@ -43,8 +43,8 @@
                     android:weightSum="1">
 
                     <EditText
-                        android:id="@+id/price"
-                        android:layout_width="140dp"
+                        android:id="@+id/preu"
+                        android:layout_width="165dp"
                         android:layout_height="wrap_content"
                         android:hint="Price" />
 
@@ -67,7 +67,7 @@
                 <ImageButton
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:id="@+id/imageButton"
+                    android:id="@+id/posicio"
                     android:scaleType="fitCenter"
                     android:adjustViewBounds="true"
                     android:baselineAlignBottom="false"

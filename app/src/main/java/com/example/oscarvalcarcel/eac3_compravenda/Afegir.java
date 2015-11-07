@@ -1,29 +1,40 @@
 package com.example.oscarvalcarcel.eac3_compravenda;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
 
-public class Afegir extends AppCompatActivity {
+public class Afegir extends AppCompatActivity implements LocationListener {
 
+    ImageView imatge;
     TextView titol;
     TextView preu;
-    ImageView imatge;
+    ImageButton posicio;
+
     private int REQ_CAMERA = 0;
     private String uploadImagePath = "";
 
@@ -34,11 +45,37 @@ public class Afegir extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        titol = (TextView) findViewById(R.id.title);
-        preu = (TextView) findViewById(R.id.price);
-        imatge = (ImageView) findViewById(R.id.image);
+        //Inicialitzem els widgets
+        titol = (TextView) findViewById(R.id.titol);
+        preu = (TextView) findViewById(R.id.preu);
+        imatge = (ImageView) findViewById(R.id.imatge);
+        posicio = (ImageButton) findViewById(R.id.posicio);
+        posicio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cridaMapa();
+                posicio.setBackgroundColor(Color.parseColor("#A1EFB4"));
 
+            }
+        });
+
+
+       // try {
+            LocationManager gestorLoc = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            //gestorLoc.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
+            //gestorLoc.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
+
+       // }catch (SecurityException s){
+       //     Log.e("Error", s.getMessage());
+       // }
         //setTitle("Sell item");
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            return;
+        }
+
+        gestorLoc.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
 
         imatge.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,15 +83,15 @@ public class Afegir extends AppCompatActivity {
                 int imageNum = 0;
 
                 Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                File items = new File(android.os.Environment.getExternalStorageDirectory(),"Items");
-                if (!items.exists()){
+                File items = new File(android.os.Environment.getExternalStorageDirectory(), "Items");
+                if (!items.exists()) {
                     items.mkdir();
                 }
 
 
                 String nom_foto = "imatge.jpg";
 
-                File directori_foto = new File(items,nom_foto);
+                File directori_foto = new File(items, nom_foto);
                 Log.d("Ruta", items.getAbsolutePath());
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(directori_foto));
                 //String path =   items.getAbsolutePath();
@@ -174,6 +211,32 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
             }
         }
 
+    @Override
+    public void onLocationChanged(Location location) {
+
     }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+    public void cridaMapa(){
+        Intent intent = new Intent(this,MapsActivity.class);
+        //startActivityForResult(intent,0);
+        startActivity(intent);
+    }
+
+}
 
 

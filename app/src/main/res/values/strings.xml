@@ -6,6 +6,7 @@
     <string name="title_activity_afegir">Sell Item</string>
     <string name="title_activity_mostra_item">MostraItem</string>
     <string name="large_text">
+
         "Material is the metaphor.\n\n"
 
         "A material metaphor is the unifying theory of a rationalized space and a system of motion."
@@ -94,4 +95,6 @@
         "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
         "when a user tries to pick up one of cards.\n\n"
     </string>
+    <string name="title_activity_maps">Map</string>
+    <string name="google_maps_key">AIzaSyC2_gRydd6JLg8ywsM4QriUfc2YOl_0_EI</string>
 </resources>
