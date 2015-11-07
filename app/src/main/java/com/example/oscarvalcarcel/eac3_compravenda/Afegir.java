@@ -21,20 +21,19 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
 
 public class Afegir extends AppCompatActivity implements LocationListener {
 
-    ImageView imatge;
-    TextView titol;
-    TextView preu;
-    ImageButton posicio;
-
+    ImageView imatge;                       //ImageView per visualitzar la foto que fem. També activarà la càmera
+    EditText titol;                         //EditText per possar el titol del article que es vol vendre
+    EditText preu;                          //EditText per possar el preu del article que es vol vendre
+    ImageButton posicio;                    //ImageButton que polsarem per trobar la nostra geolocalització
     private int REQ_CAMERA = 0;
     private String uploadImagePath = "";
 
@@ -46,36 +45,37 @@ public class Afegir extends AppCompatActivity implements LocationListener {
         setSupportActionBar(toolbar);
 
         //Inicialitzem els widgets
-        titol = (TextView) findViewById(R.id.titol);
-        preu = (TextView) findViewById(R.id.preu);
+        titol = (EditText) findViewById(R.id.titol);
+        preu = (EditText) findViewById(R.id.preu);
         imatge = (ImageView) findViewById(R.id.imatge);
         posicio = (ImageButton) findViewById(R.id.posicio);
+
+
+        //Activem el sistema de localització
+        LocationManager gestorLoc = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        //Comprovem que s'han concedit els persmisos
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            return;
+        }
+
+        //Demanem l'actualització de la posició cada segón quan ens movem 1 metre
+        gestorLoc.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
+
+
+
+        //Establim un listener per al botó per quan fem click
         posicio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //cridem al mètode que obra l'activitat de maps i canviem el color de fons del botó
                 cridaMapa();
                 posicio.setBackgroundColor(Color.parseColor("#A1EFB4"));
 
             }
         });
 
-
-       // try {
-            LocationManager gestorLoc = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            //gestorLoc.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
-            //gestorLoc.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
-
-       // }catch (SecurityException s){
-       //     Log.e("Error", s.getMessage());
-       // }
-        //setTitle("Sell item");
-
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            return;
-        }
-
-        gestorLoc.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
 
         imatge.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,26 +130,26 @@ public class Afegir extends AppCompatActivity implements LocationListener {
     }
 
 
-@Override
-protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    super.onActivityResult(requestCode, resultCode, data);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-    //Si tot ha sortit bé
-    if (RESULT_OK == resultCode) {
-        if (requestCode == REQ_CAMERA) {
-            //Bitmap bmp = new Bit
+        //Si tot ha sortit bé
+        if (RESULT_OK == resultCode) {
+            if (requestCode == REQ_CAMERA) {
+                //Bitmap bmp = new Bit
 
-            File f = new File(Environment.getExternalStorageDirectory()
-                    .toString());
-            for (File temp : f.listFiles()) {
-                if (temp.getName().equals("Items")) {
-                    f = temp;
-                    break;
+                File f = new File(Environment.getExternalStorageDirectory()
+                        .toString());
+                for (File temp : f.listFiles()) {
+                    if (temp.getName().equals("Items")) {
+                        f = temp;
+                        break;
+                    }
                 }
-            }
 
-           // Uri u = intent.getData(); // this gonna give you the pic's uri
-            // you should convert this to a path (see the link below the code section
+                // Uri u = intent.getData(); // this gonna give you the pic's uri
+                // you should convert this to a path (see the link below the code section
 
         /*
         // Obtenim els extras
@@ -162,18 +162,18 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         imatge.setImageBitmap(bmp);*/
 
 
-        //-----------------------------------------------------------
-        //super.onActivityResult(requestCode, resultCode, data);
-        //if (resultCode == Activity.RESULT_OK) {
-        //    if (requestCode == REQUEST_CAMERA) {
-        //        File f = new File(Environment.getExternalStorageDirectory()
-        //                .toString());
-        //        for (File temp : f.listFiles()) {
-        //            if (temp.getName().equals("temp.jpg")) {
-        //                f = temp;
-         //               break;
-         //           }
-         //       }
+                //-----------------------------------------------------------
+                //super.onActivityResult(requestCode, resultCode, data);
+                //if (resultCode == Activity.RESULT_OK) {
+                //    if (requestCode == REQUEST_CAMERA) {
+                //        File f = new File(Environment.getExternalStorageDirectory()
+                //                .toString());
+                //        for (File temp : f.listFiles()) {
+                //            if (temp.getName().equals("temp.jpg")) {
+                //                f = temp;
+                //               break;
+                //           }
+                //       }
                 try {
                     Bitmap bm;
                     BitmapFactory.Options btmapOptions = new BitmapFactory.Options();
@@ -188,11 +188,11 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
                     e.printStackTrace();
                 }
             }// else if (requestCode == SELECT_FILE) {
-                Uri selectedImageUri = data.getData();
+            Uri selectedImageUri = data.getData();
 
-       // When you capture image, in onActivityResult() use that URI to obtain file path:
+            // When you capture image, in onActivityResult() use that URI to obtain file path:
 
-        String[] projection = { MediaStore.Images.Media.DATA};
+            String[] projection = {MediaStore.Images.Media.DATA};
         /*try (Cursor cursor = managedQuery(selectedImageUri, projection, null, null, null)) {
             int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             cursor.moveToFirst();
@@ -208,11 +208,16 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
                 imatge.setImageBitmap(bm);
                 uploadImagePath = tempPath;*/
 
-            }
         }
+    }
 
     @Override
     public void onLocationChanged(Location location) {
+
+        String text = "Posició actual:\n" +
+                "Latitud " + location.getLatitude() + "\n" +
+                "Longitud " + location.getLongitude();
+        Toast.makeText(getApplicationContext(),text,Toast.LENGTH_LONG).show();
 
     }
 
@@ -231,8 +236,8 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
     }
 
-    public void cridaMapa(){
-        Intent intent = new Intent(this,MapsActivity.class);
+    public void cridaMapa() {
+        Intent intent = new Intent(this, MapsActivity.class);
         //startActivityForResult(intent,0);
         startActivity(intent);
     }
