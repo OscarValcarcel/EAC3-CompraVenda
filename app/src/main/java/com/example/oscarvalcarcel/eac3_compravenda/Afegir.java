@@ -1,41 +1,45 @@
 package com.example.oscarvalcarcel.eac3_compravenda;
 
-import android.Manifest;
-import android.content.Context;
+import android.content.ContentResolver;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.util.UUID;
 
 public class Afegir extends AppCompatActivity implements LocationListener {
 
-    ImageView imatge;                       //ImageView per visualitzar la foto que fem. També activarà la càmera
-    EditText titol;                         //EditText per possar el titol del article que es vol vendre
-    EditText preu;                          //EditText per possar el preu del article que es vol vendre
-    ImageButton posicio;                    //ImageButton que polsarem per trobar la nostra geolocalització
-    private int REQ_CAMERA = 0;
-    private String uploadImagePath = "";
+
+    private ImageView imatge;                                      //ImageView per visualitzar la foto que fem. També activarà la càmera
+    private EditText titol;                                        //EditText per possar el titol del article que es vol vendre
+    private EditText preu;                                         //EditText per possar el preu del article que es vol vendre
+    private EditText descripcio;
+    private ImageButton posicio;                                   //ImageButton que polsarem per trobar la nostra geolocalització
+    private static final int REQ_CAMERA = 0;               //Constant amb el número que identifica l'activitat de l'aplicació de fotos
+    private static final int REQ_MAP = 1;                  //Constant amb el número que identifica l'activitat de Google Maps
+    private Location location;                                     //Variable que desarà la nostra localització.
+    private Uri identificadorFoto = null;                                 //Variable del tipus URI que guardarà l'identificador del arxiu
+    private Bitmap bitmap;
+    private DBInterface db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,37 +48,34 @@ public class Afegir extends AppCompatActivity implements LocationListener {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //Inicialitzem els widgets
+        //Inicialitzem els widgets i la DB
         titol = (EditText) findViewById(R.id.titol);
         preu = (EditText) findViewById(R.id.preu);
+        descripcio = (EditText) findViewById(R.id.descripcio);
         imatge = (ImageView) findViewById(R.id.imatge);
         posicio = (ImageButton) findViewById(R.id.posicio);
+        db = new DBInterface(this);
 
 
-        //Activem el sistema de localització
-        LocationManager gestorLoc = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        //Comprovem que s'han concedit els persmisos
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            return;
-        }
-
-        //Demanem l'actualització de la posició cada segón quan ens movem 1 metre
-        gestorLoc.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
-
-
-
-        //Establim un listener per al botó per quan fem click
-        posicio.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //cridem al mètode que obra l'activitat de maps i canviem el color de fons del botó
-                cridaMapa();
-                posicio.setBackgroundColor(Color.parseColor("#A1EFB4"));
-
-            }
+        final Button comprobar = (Button) findViewById(R.id.comprobar);
+        comprobar.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+             comprobaDB();
+             }
         });
+
+
+                //Establim un listener per al botó per quan fem click
+                posicio.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //cridem al mètode que obra l'activitat de maps i canviem el color de fons del botó
+                        cridaMapa();
+
+
+                    }
+                });
 
 
         imatge.setOnClickListener(new View.OnClickListener() {
@@ -83,19 +84,24 @@ public class Afegir extends AppCompatActivity implements LocationListener {
                 int imageNum = 0;
 
                 Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                File items = new File(android.os.Environment.getExternalStorageDirectory(), "Items");
+                File items = new File(android.os.Environment.getExternalStorageDirectory().toString() + "/Items/");
+
+                //Si la carpeta no existeix la creem
                 if (!items.exists()) {
                     items.mkdir();
                 }
 
+                String nomFoto = UUID.randomUUID().toString() + ".jpg";
+                //Creem el fitxer per a la foto que farem. Passem com a paràmetre el directori on volem desar-la i el nom
+                File fitxerFoto = new File(items, nomFoto);
 
-                String nom_foto = "imatge.jpg";
+                //Passem a l'Intent el fitxer per a que sàpiga on ha de desar la foto
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(fitxerFoto));
 
-                File directori_foto = new File(items, nom_foto);
-                Log.d("Ruta", items.getAbsolutePath());
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(directori_foto));
+                identificadorFoto = Uri.fromFile(fitxerFoto);
                 //String path =   items.getAbsolutePath();
                 startActivityForResult(intent, REQ_CAMERA);
+
 
             }
         });
@@ -113,17 +119,50 @@ public class Afegir extends AppCompatActivity implements LocationListener {
 
     }
 
+    public void comprobaDB() {
+        Intent dbmanager = new Intent(this, AndroidDatabaseManager.class);
+        startActivity(dbmanager);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+
+        //Intent dbmanager = new Intent(this,AndroidDatabaseManager.class);
+        //startActivity(dbmanager);
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
+        String textTitol = titol.getText().toString();
+        String textPreu = preu.getText().toString();
+        String textDescripcio = descripcio.getText().toString();
+
+        //Si pulsem el icon per validar que tota l'entrada del item és correcta
         if (id == R.id.done) {
-            Toast.makeText(this, "Completa totes les dades!", Toast.LENGTH_SHORT).show();
-            return true;
+
+            //Si no tenim totes les dades complertes
+            if ((location == null) || (textTitol.equals("")) || (textPreu.equals("")) || (textDescripcio.equals("")) || (bitmap == null)) {
+
+                //Avisem amb un Toast
+                Toast.makeText(this, "Completa totes les dades!", Toast.LENGTH_SHORT).show();
+                return true;
+
+            } else {
+                //LatLng latlng = new LatLng(location.getLatitude(),location.getLongitude());
+
+                db.obre();
+                db.esborraTaula();
+                db.insereixArticle(textTitol, textPreu, textDescripcio, identificadorFoto.toString(), location.toString());
+                Toast.makeText(this, "Article inserit correctament", Toast.LENGTH_SHORT).show();
+                db.tanca();
+
+
+                Intent i = new Intent(this,LlistaItems.class);
+                startActivity(i);
+
+            }
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -134,90 +173,69 @@ public class Afegir extends AppCompatActivity implements LocationListener {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        // imatge = (ImageView) findViewById(R.id.imatge);
+
         //Si tot ha sortit bé
         if (RESULT_OK == resultCode) {
             if (requestCode == REQ_CAMERA) {
-                //Bitmap bmp = new Bit
 
-                File f = new File(Environment.getExternalStorageDirectory()
-                        .toString());
-                for (File temp : f.listFiles()) {
-                    if (temp.getName().equals("Items")) {
-                        f = temp;
-                        break;
-                    }
-                }
+                ContentResolver contRes = getContentResolver();
+                contRes.notifyChange(identificadorFoto, null);
 
-                // Uri u = intent.getData(); // this gonna give you the pic's uri
-                // you should convert this to a path (see the link below the code section
-
-        /*
-        // Obtenim els extras
-        Bundle extras = data.getExtras();
-        // Obtenim la imatge del extra
-        Bitmap bmp = (Bitmap) extras.get("data");
-
-        //La establim en el widget
-        imatge = (ImageView) findViewById(R.id.image);
-        imatge.setImageBitmap(bmp);*/
-
-
-                //-----------------------------------------------------------
-                //super.onActivityResult(requestCode, resultCode, data);
-                //if (resultCode == Activity.RESULT_OK) {
-                //    if (requestCode == REQUEST_CAMERA) {
-                //        File f = new File(Environment.getExternalStorageDirectory()
-                //                .toString());
-                //        for (File temp : f.listFiles()) {
-                //            if (temp.getName().equals("temp.jpg")) {
-                //                f = temp;
-                //               break;
-                //           }
-                //       }
                 try {
-                    Bitmap bm;
-                    BitmapFactory.Options btmapOptions = new BitmapFactory.Options();
+                    bitmap = android.provider.MediaStore.Images.Media.getBitmap(contRes, identificadorFoto);
+                    //////////////////////////////////////////////////////////////////////////////////////////7
+                    Bitmap bmp = BitmapFactory.decodeFile(identificadorFoto.toString().replace("file://", ""));
 
-                    bm = BitmapFactory.decodeFile(f.getAbsolutePath(), btmapOptions);
 
-                    bm = Bitmap.createScaledBitmap(bm, 70, 70, true);
-                    imatge.setImageBitmap(bm);
-                    uploadImagePath = f.getAbsolutePath();
+                    // Reduïm la imatge per no tenir problemes de visualització.
+                    int height = (bitmap.getHeight() * 800 / bitmap.getWidth());
+                    Bitmap resized = Bitmap.createScaledBitmap(bitmap, 800, height, true);
 
+                    // Guardem el Bitmap generat
+                    FileOutputStream stream = new FileOutputStream(identificadorFoto.toString().replace("file://", ""));
+                    resized.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                    stream.flush();
+                    stream.close();
+                    // L'assignem a l'ImageView
+                    //imatge.set
+                    // imatge.setImageResource(android.R.color.transparent);
+                    //imatge.setImageResource(android.R.color.white);
+                    imatge.setImageBitmap(resized);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Toast.makeText(this, "No es pot carregar la imatge" +
+                                    identificadorFoto.toString(),
+                            Toast.LENGTH_SHORT).show();
                 }
-            }// else if (requestCode == SELECT_FILE) {
-            Uri selectedImageUri = data.getData();
 
-            // When you capture image, in onActivityResult() use that URI to obtain file path:
+            } else {
+                if (requestCode == REQ_MAP) {
+                    Bundle extras = data.getExtras();
+                    location = (Location) extras.get("posicio");
 
-            String[] projection = {MediaStore.Images.Media.DATA};
-        /*try (Cursor cursor = managedQuery(selectedImageUri, projection, null, null, null)) {
-            int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            String capturedImageFilePath = cursor.getString(column_index_data);
-        }*/
-/*
-                String tempPath = getPath(selectedImageUri, getActivity());
-                String ruta = getA
-                Bitmap bm;
-                BitmapFactory.Options btmapOptions = new BitmapFactory.Options();
-                bm = BitmapFactory.decodeFile(tempPath, btmapOptions);
-                imatge = (ImageView) findViewById(R.id.image);
-                imatge.setImageBitmap(bm);
-                uploadImagePath = tempPath;*/
+                    if (location != null) {
+                        posicio.getBackground().setColorFilter(Color.rgb(204, 255, 204), PorterDuff.Mode.MULTIPLY);
+                    }
 
+                    String text = "Posició actual:\n" +
+                            "Latitud " + location.getLatitude() + "\n" +
+                            "Longitud " + location.getLongitude();
+                    Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
+
+                }
+
+            }
         }
     }
 
+
     @Override
     public void onLocationChanged(Location location) {
-
+       /* this.location = location;
         String text = "Posició actual:\n" +
                 "Latitud " + location.getLatitude() + "\n" +
                 "Longitud " + location.getLongitude();
-        Toast.makeText(getApplicationContext(),text,Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(),text,Toast.LENGTH_LONG).show();*/
 
     }
 
@@ -236,11 +254,12 @@ public class Afegir extends AppCompatActivity implements LocationListener {
 
     }
 
+    //Mètode per cridar a l'activitat de tipus Google Maps
     public void cridaMapa() {
         Intent intent = new Intent(this, MapsActivity.class);
-        //startActivityForResult(intent,0);
-        startActivity(intent);
+        startActivityForResult(intent, REQ_MAP);
     }
+
 
 }
 
