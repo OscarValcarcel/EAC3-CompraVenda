@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="com.vallabh.googlemapspractice.permission.MAPS_RECEIVE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
@@ -16,7 +17,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/shoopping2"
+        android:icon="@mipmap/shopping_cart"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
@@ -64,6 +65,9 @@
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" >
         </activity>
+
+        <activity android:name="com.example.oscarvalcarcel.eac3_compravenda.AndroidDatabaseManager"
+            android:theme="@style/Theme.AppCompat.Light"/>
     </application>
 
 </manifest>

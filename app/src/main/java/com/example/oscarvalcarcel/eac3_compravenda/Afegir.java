@@ -3,7 +3,6 @@ package com.example.oscarvalcarcel.eac3_compravenda;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.location.Location;
@@ -152,7 +151,7 @@ public class Afegir extends AppCompatActivity implements LocationListener {
                 //LatLng latlng = new LatLng(location.getLatitude(),location.getLongitude());
 
                 db.obre();
-                db.esborraTaula();
+                //db.esborraTaula();
                 db.insereixArticle(textTitol, textPreu, textDescripcio, identificadorFoto.toString(), location.toString());
                 Toast.makeText(this, "Article inserit correctament", Toast.LENGTH_SHORT).show();
                 db.tanca();
@@ -184,9 +183,6 @@ public class Afegir extends AppCompatActivity implements LocationListener {
 
                 try {
                     bitmap = android.provider.MediaStore.Images.Media.getBitmap(contRes, identificadorFoto);
-                    //////////////////////////////////////////////////////////////////////////////////////////7
-                    Bitmap bmp = BitmapFactory.decodeFile(identificadorFoto.toString().replace("file://", ""));
-
 
                     // Reduïm la imatge per no tenir problemes de visualització.
                     int height = (bitmap.getHeight() * 800 / bitmap.getWidth());
@@ -197,10 +193,8 @@ public class Afegir extends AppCompatActivity implements LocationListener {
                     resized.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                     stream.flush();
                     stream.close();
+
                     // L'assignem a l'ImageView
-                    //imatge.set
-                    // imatge.setImageResource(android.R.color.transparent);
-                    //imatge.setImageResource(android.R.color.white);
                     imatge.setImageBitmap(resized);
                 } catch (Exception e) {
                     Toast.makeText(this, "No es pot carregar la imatge" +
@@ -213,6 +207,7 @@ public class Afegir extends AppCompatActivity implements LocationListener {
                     Bundle extras = data.getExtras();
                     location = (Location) extras.get("posicio");
 
+                    //Si tenim posició cambiém el color del fons del botó
                     if (location != null) {
                         posicio.getBackground().setColorFilter(Color.rgb(204, 255, 204), PorterDuff.Mode.MULTIPLY);
                     }
