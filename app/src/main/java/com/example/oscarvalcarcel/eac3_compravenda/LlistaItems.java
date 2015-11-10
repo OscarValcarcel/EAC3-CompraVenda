@@ -26,6 +26,7 @@ public class LlistaItems extends AppCompatActivity implements AdapterView.OnItem
     HashMap<String, String> element = null;                               //Informació de cada article
     DBInterface db;                                                       //Objecte per gestionar la base de Dades
     ListView llista;                                                      //Widget on carregarem tots els articles
+    int nombreArticles;
 
 
     @Override
@@ -43,7 +44,7 @@ public class LlistaItems extends AppCompatActivity implements AdapterView.OnItem
 
         adaptador = new SimpleAdapter(getBaseContext(), llistaArticles, R.layout.layout_llista, clausOrigen, vistesDesti);
 
-        //Inicialitzem la listView
+        //Inicialitzem la listView i li lliguem un adaptador
         llista = (ListView) findViewById(R.id.llistaItems);
         llista.setAdapter(adaptador);
 
@@ -53,7 +54,7 @@ public class LlistaItems extends AppCompatActivity implements AdapterView.OnItem
         //Cridem a aquest mètode per recuperar els articles de la BD i mostrar-los a la ListView
         obtenirArticlesDeDB();
 
-        //afegim un listener a la llista
+        //afegim un listener a la llista per controlar quan fem click en un element de la llista
         llista.setOnItemClickListener(this);
 
 
@@ -70,19 +71,22 @@ public class LlistaItems extends AppCompatActivity implements AdapterView.OnItem
 
     }
 
+    //Mètode per començar l'actiivat d'afegir articles
     public void cridaAfegir() {
         Intent intent = new Intent(this, Afegir.class);
-        //startActivityForResult(intent,0);
-        startActivityForResult(intent, REQ_AFEGIR);
+        startActivity(intent);
+        //startActivityForResult(intent, REQ_AFEGIR);
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        //obrim la nostra BD
         db.obre();
-        //HashMap<String,String> el = llistaArticles.get(parent.getSelectedItemPosition());
-        String desc = db.obtenirArticle((long) position + 1).getString(3);
+
+        //cridem el mètode per obenir un article. Li passem  com a paràmetre el nombre d'articles total menys la posició
+        //del item en el qual hem fet click ja que hem invertit l'ordre quan hem afegit els articles a la llista
+        String desc = db.obtenirArticle((long)nombreArticles - position).getString(3);
         Snackbar.make(view, desc, Snackbar.LENGTH_LONG).setAction("Action", null).show();
-        //db.tanca();
     }
 
     //Mètode per recuperar els articles guardats a la BD
@@ -95,6 +99,9 @@ public class LlistaItems extends AppCompatActivity implements AdapterView.OnItem
 
         //Cridem al mètode per recuperar tots els articles desats a la BD
         Cursor cursor = db.obtenirTotsArticles();
+
+        //Recuperem quants articles tenim guardats a la BD
+        nombreArticles = cursor.getCount();
 
         //Si hi han dades i ens podem moure a la primera posició del cursor
         if (cursor.moveToFirst()) {
@@ -115,8 +122,8 @@ public class LlistaItems extends AppCompatActivity implements AdapterView.OnItem
                 element.put("detalls", titol + " - " + preu + " €");
                 element.put("descripcio", descripcio);
 
-                //Afegim el HashMap al nostre ArrayList
-                llistaArticles.add(element);
+                //Afegim l'article al nostre ArrayList d'articles en la primera posició per a que desprès es vegi al damunt del ListView
+                llistaArticles.add(0,element);
 
             } while (cursor.moveToNext());
 
@@ -126,7 +133,7 @@ public class LlistaItems extends AppCompatActivity implements AdapterView.OnItem
         // Tanquem la BD
         db.tanca();
 
-        // Notifiquem al ListView que hi ha hagut canvis.
+        // Notifiquem al ListView que hi han hagut canvis.
         adaptador.notifyDataSetChanged();
 
 
