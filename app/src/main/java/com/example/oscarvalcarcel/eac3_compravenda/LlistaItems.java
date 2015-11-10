@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class LlistaItems extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class LlistaItems extends AppCompatActivity implements AdapterView.OnItemClickListener,AdapterView.OnItemLongClickListener {
 
 
     private final static int REQ_AFEGIR = 0;                              //Constant amb el número que identifica l'activitat per afegir articles
@@ -54,8 +54,9 @@ public class LlistaItems extends AppCompatActivity implements AdapterView.OnItem
         //Cridem a aquest mètode per recuperar els articles de la BD i mostrar-los a la ListView
         obtenirArticlesDeDB();
 
-        //afegim un listener a la llista per controlar quan fem click en un element de la llista
+        //afegim els listeners per als elements de la llista
         llista.setOnItemClickListener(this);
+        llista.setOnItemLongClickListener(this);
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -88,6 +89,15 @@ public class LlistaItems extends AppCompatActivity implements AdapterView.OnItem
         String desc = db.obtenirArticle((long)nombreArticles - position).getString(3);
         Snackbar.make(view, desc, Snackbar.LENGTH_LONG).setAction("Action", null).show();
     }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        Intent intent = new Intent(this, MostraItem.class);
+        startActivity(intent);
+        return true;
+    }
+
+
 
     //Mètode per recuperar els articles guardats a la BD
     public void obtenirArticlesDeDB() {
@@ -138,6 +148,9 @@ public class LlistaItems extends AppCompatActivity implements AdapterView.OnItem
 
 
     }
+
+
+
 }
 
 
