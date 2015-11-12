@@ -104,7 +104,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public boolean onMarkerClick(Marker marker) {
 
         Intent i = new Intent(this,Afegir.class);
-        i.putExtra("posicio",location);
+        i.putExtra("location",location);
         setResult(RESULT_OK, i);
         finish();
 

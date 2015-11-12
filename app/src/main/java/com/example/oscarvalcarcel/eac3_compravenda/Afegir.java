@@ -21,6 +21,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.UUID;
@@ -156,9 +158,15 @@ public class Afegir extends AppCompatActivity implements LocationListener {
                 Toast.makeText(this, "Article inserit correctament", Toast.LENGTH_SHORT).show();
                 db.tanca();
 
-
+                //Creem un intent per arrancar l'activitat de LlistarItems
                 Intent i = new Intent(this,LlistaItems.class);
+
+                //Possem la location en el intent
+                i.putExtra("location", location);
+
+                //Arranquem l'activitat de LlistarItems
                 startActivity(i);
+                //finish();
 
             }
 
@@ -205,7 +213,7 @@ public class Afegir extends AppCompatActivity implements LocationListener {
             } else {
                 if (requestCode == REQ_MAP) {
                     Bundle extras = data.getExtras();
-                    location = (Location) extras.get("posicio");
+                    location = (Location) extras.get("location");
 
                     //Si tenim posició cambiém el color del fons del botó
                     if (location != null) {
@@ -216,6 +224,7 @@ public class Afegir extends AppCompatActivity implements LocationListener {
                             "Latitud " + location.getLatitude() + "\n" +
                             "Longitud " + location.getLongitude();
                     Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
+
 
                 }
 
