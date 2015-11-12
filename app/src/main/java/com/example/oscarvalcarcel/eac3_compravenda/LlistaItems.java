@@ -86,14 +86,28 @@ public class LlistaItems extends AppCompatActivity implements AdapterView.OnItem
 
         //cridem el mètode per obenir un article. Li passem  com a paràmetre el nombre d'articles total menys la posició
         //del item en el qual hem fet click ja que hem invertit l'ordre quan hem afegit els articles a la llista
-        String desc = db.obtenirArticle((long)nombreArticles - position).getString(3);
+        String desc = db.obtenirArticle((long)nombreArticles - position).getString(3); //Obtenim la descripció de l'article
         Snackbar.make(view, desc, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+
+        //Tanquem la BD
+        db.tanca();
     }
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+        //cridem el mètode per obenir un article. Li passem  com a paràmetre el nombre d'articles total menys la posició
+        //del item en el qual hem fet click ja que hem invertit l'ordre quan hem afegit els articles a la llista
+        String ruta = db.obtenirArticle((long)nombreArticles - position).getString(4); //Obtenim la ruta de l'article
         Intent intent = new Intent(this, MostraItem.class);
+
+        //Possem la ruta en el intent que utilitzarem per arrancar l'activitat de mostrar el articles.
+        intent.putExtra("ruta",ruta);
         startActivity(intent);
+
+        //Tanquem la BD
+        db.tanca();
+
         return true;
     }
 
