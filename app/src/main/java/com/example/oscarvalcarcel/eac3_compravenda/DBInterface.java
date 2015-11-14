@@ -20,6 +20,9 @@ public class DBInterface {
     public static final String CLAU_DESCRIPCIO = "descripcio";
     public static final String CLAU_IMATGE = "imatge";
     public static final String CLAU_POSICIO = "posicio";
+    public static final String CLAU_LONGITUD = "longitud";
+    public static final String CLAU_LATITUD = "latitud";
+
 
     public static final String TAG = "DBInterface";
 
@@ -28,10 +31,15 @@ public class DBInterface {
     public static final int VERSIO = 1;
 
     //Constant amb la sentència SQL que crearà la taula
+    /*public static final String BD_CREATE =
+            "create table " + BD_TAULA + "( " + CLAU_ID + " integer primary key autoincrement, " + CLAU_TITOL + " text not null, " +
+                    CLAU_PREU + " text not null, " + CLAU_DESCRIPCIO + " text not null, " + CLAU_IMATGE + " text not null, " +
+                    CLAU_POSICIO + " text not null);";*/
+
     public static final String BD_CREATE =
             "create table " + BD_TAULA + "( " + CLAU_ID + " integer primary key autoincrement, " + CLAU_TITOL + " text not null, " +
                     CLAU_PREU + " text not null, " + CLAU_DESCRIPCIO + " text not null, " + CLAU_IMATGE + " text not null, " +
-                    CLAU_POSICIO + " text not null);";
+                    CLAU_LONGITUD + " text not null, " + CLAU_LATITUD + " text not null);";
 
 
     private final Context context;
@@ -58,7 +66,7 @@ public class DBInterface {
 
     //Insereix l'article a la Base de Dades
     public long insereixArticle(String titol, String preu, String descripcio, String imatge,
-                                String posicio) {
+                                String longitud, String latitud) {
 
         //Creem un objecte ContentValues que ens ajudarà a insertar els valors
         ContentValues initialValues = new ContentValues();
@@ -66,7 +74,10 @@ public class DBInterface {
         initialValues.put(CLAU_PREU, preu);
         initialValues.put(CLAU_DESCRIPCIO, descripcio);
         initialValues.put(CLAU_IMATGE, imatge);
-        initialValues.put(CLAU_POSICIO, posicio);
+        //initialValues.put(CLAU_POSICIO, posicio);
+        initialValues.put(CLAU_LONGITUD, longitud);
+        initialValues.put(CLAU_LATITUD, latitud);
+
 
 
 
@@ -85,7 +96,7 @@ public class DBInterface {
     //Obté una article
     public Cursor obtenirArticle(Long IDFila) throws SQLException {
             Cursor mCursor = bd.query(true, BD_TAULA, new String[] {CLAU_ID, CLAU_TITOL, CLAU_PREU,
-                            CLAU_DESCRIPCIO, CLAU_IMATGE, CLAU_POSICIO}, CLAU_ID + " = " + IDFila,
+                            CLAU_DESCRIPCIO, CLAU_IMATGE, CLAU_LONGITUD, CLAU_LATITUD}, CLAU_ID + " = " + IDFila,
                     null, null, null, null, null);
 
         if(mCursor != null) {
@@ -99,7 +110,7 @@ public class DBInterface {
     //Obté totes les noticies de la Base de Dades
     public Cursor obtenirTotsArticles() {
         return bd.query(BD_TAULA, new String[]{CLAU_ID, CLAU_TITOL, CLAU_PREU,
-                        CLAU_DESCRIPCIO, CLAU_IMATGE, CLAU_POSICIO}, null,
+                        CLAU_DESCRIPCIO, CLAU_IMATGE, CLAU_LONGITUD, CLAU_LATITUD}, null,
                 null, null, null, null);
     }
 

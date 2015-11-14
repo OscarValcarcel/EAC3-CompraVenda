@@ -2,7 +2,6 @@ package com.example.oscarvalcarcel.eac3_compravenda;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -18,7 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class LlistaItems extends AppCompatActivity implements AdapterView.OnItemClickListener,AdapterView.OnItemLongClickListener {
+public class LlistaItems extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
 
     private final static int REQ_AFEGIR = 0;                              //Constant amb el número que identifica l'activitat per afegir articles
@@ -29,7 +28,7 @@ public class LlistaItems extends AppCompatActivity implements AdapterView.OnItem
     DBInterface db;                                                       //Objecte per gestionar la base de Dades
     ListView llista;                                                      //Widget on carregarem tots els articles
     int nombreArticles;
-    Location location;
+
 
 
     @Override
@@ -39,7 +38,7 @@ public class LlistaItems extends AppCompatActivity implements AdapterView.OnItem
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        String[] clausOrigen = {"foto", "detalls", "descripcio"};
+        String[] clausOrigen = {"ruta", "detalls", "descripcio"};
 
         // Identificadors dels elements de layout_llista corresponents per visualitzar-los
         int[] vistesDesti = {R.id.foto, R.id.detalls};
@@ -54,10 +53,10 @@ public class LlistaItems extends AppCompatActivity implements AdapterView.OnItem
         //Inicialitzem la nostra base de dades
         db = new DBInterface(this);
 
-        //Cridem a aquest mètode per recuperar els articles de la BD i mostrar-los a la ListView
         obtenirArticlesDeDB();
 
-        //afegim els listeners per als elements de la llista
+
+        //afegim els listeners per als items de la llista
         llista.setOnItemClickListener(this);
         llista.setOnItemLongClickListener(this);
 
@@ -70,73 +69,51 @@ public class LlistaItems extends AppCompatActivity implements AdapterView.OnItem
                 cridaAfegir();
             }
 
-
         });
 
     }
 
-    //Mètode per començar l'actiivat d'afegir articles
-    public void cridaAfegir() {
-        Intent intent = new Intent(this, Afegir.class);
-        //startActivity(intent);
-        startActivityForResult(intent, REQ_AFEGIR);
-    }
-
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        //obrim la nostra BD
-        db.obre();
 
-        //cridem el mètode per obenir un article. Li passem  com a paràmetre el nombre d'articles total menys la posició
-        //del item en el qual hem fet click ja que hem invertit l'ordre quan hem afegit els articles a la llista
-        String desc = db.obtenirArticle((long) nombreArticles - position).getString(3); //Obtenim la descripció de l'article
-        Snackbar.make(view, desc, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+        //Recuperem el nostre article
+        element = llistaArticles.get(position);
 
-        //Tanquem la BD
-        db.tanca();
+        //Mostrem la descripcio al snackbar
+        Snackbar.make(view, element.get("descripcio"), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+
     }
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-        db.obre();
+        //Recuperem el nostre article
+        HashMap<String, String> element = llistaArticles.get(position);
 
-        //cridem el mètode per obenir un article. Li passem  com a paràmetre el nombre d'articles total menys la posició
-        //del item en el qual hem fet click ja que hem invertit l'ordre quan hem afegit els articles a la llista
-        //Obtenim la descripció i la ruta de l'article
-        String titol = db.obtenirArticle((long) nombreArticles - position).getString(1);
-        String preu = db.obtenirArticle((long) nombreArticles - position).getString(2);
-        String descripcio = db.obtenirArticle((long) nombreArticles - position).getString(3);
-        String ruta = db.obtenirArticle((long) nombreArticles - position).getString(4);
-
-        ////////////IMPLEMENTAR PARTE DE DB DE LONGITUD Y LATITUD Y RECUPERALO AQUI
-        //String posicio = db.obtenirArticle((long) nombreArticles - position).getString(5);
-
-
-        //Recuperem el intent de l'activitat d'Afegir articles i els seus extres.
-        Intent i = getIntent();
-        Bundle extras = i.getExtras();
-
-
-        //Trobem la location que es troba en els extres del intent
-        // Location location = (Location) extras.get("location");
+      /*  //I tots els seus atributs
+        String titol = element.get("titol");
+        String preu = element.get("preu");
+        String descripcio = element.get("descripcio");
+        String ruta = element.get("ruta");
+        String longitud = element.get("longitud");
+        String latitud = element.get("latitud");
+*/
 
         //Creem un altre intent que utilitzarem per arrancar l'activitat de mostrar Articles
         Intent intent = new Intent(this, MostraItem.class);
 
-        //Possem totes les dades en el intent que utilitzarem per arrancar l'activitat de mostrar el articles.
-        intent.putExtra("titol", titol);
-        intent.putExtra("preu", preu);
-        intent.putExtra("descripcio", descripcio);
-        intent.putExtra("ruta", ruta);
-        intent.putExtra("id_article", (position + 1));//El id del article dintre de la bd
-        //intent.putExtra("posicio", posicio);
-        intent.putExtra("location", location);
+        //Possem totes les dades que recuperem del element en el intent que utilitzarem per arrancar l'activitat de mostrar el articles.
+        intent.putExtra("titol", element.get("titol"));
+        intent.putExtra("preu", element.get("preu"));
+        intent.putExtra("descripcio", element.get("descripcio"));
+        intent.putExtra("ruta", element.get("ruta"));
+        intent.putExtra("id_article", element.get("id_article"));//El id del article dintre de la bd
+        intent.putExtra("longitud", element.get("longitud"));
+        intent.putExtra("latitud", element.get("latitud"));
 
+        //Iniciem l'activitat per Mostrar els articles
+        startActivityForResult(intent, REQ_MOSTRAR);
 
-
-        //Tanquem la BD
-        db.tanca();
 
         return true;
     }
@@ -145,7 +122,7 @@ public class LlistaItems extends AppCompatActivity implements AdapterView.OnItem
     //Mètode per recuperar els articles guardats a la BD
     public void obtenirArticlesDeDB() {
         //Declarem les variagles per emmagatzemmar les dades que volem de la BD
-        String titol, preu, descripcio, ruta_imatge;
+        String id_article, titol, preu, descripcio, ruta_imatge, latitud, longitud;
 
         //Obrim la nostre BD
         db.obre();
@@ -153,27 +130,36 @@ public class LlistaItems extends AppCompatActivity implements AdapterView.OnItem
         //Cridem al mètode per recuperar tots els articles desats a la BD
         Cursor cursor = db.obtenirTotsArticles();
 
-        //Recuperem quants articles tenim guardats a la BD
-        nombreArticles = cursor.getCount();
+        /*//Recuperem quants articles tenim guardats a la BD
+        nombreArticles = cursor.getCount();*/
 
         //Si hi han dades i ens podem moure a la primera posició del cursor
         if (cursor.moveToFirst()) {
 
-            //Anem recorrent el Cursor
+            //Anem recorrent el Cursor i desant les dades
             do {
 
+                id_article = Integer.toString(cursor.getInt(0));
                 titol = cursor.getString(1);
                 preu = cursor.getString(2);
                 descripcio = cursor.getString(3);
                 ruta_imatge = cursor.getString(4);
+                longitud = cursor.getString(5);
+                latitud = cursor.getString(6);
 
                 //Inicialitzem el Hashmap que ens servirà per anar afegint totes les dades que hem anat recuperant de la BD
                 element = new HashMap<String, String>();
 
                 //Anem possant les claus i valors al HashMap
-                element.put("foto", ruta_imatge);
+                element.put("id_article", id_article);
+                element.put("ruta", ruta_imatge);
+                element.put("titol",titol);
+                element.put("preu",preu);
                 element.put("detalls", titol + " - " + preu + " €");
                 element.put("descripcio", descripcio);
+                element.put("latitud", latitud);
+                element.put("longitud", longitud);
+
 
                 //Afegim l'article al nostre ArrayList d'articles en la primera posició per a que desprès es vegi al damunt del ListView
                 llistaArticles.add(0, element);
@@ -190,25 +176,33 @@ public class LlistaItems extends AppCompatActivity implements AdapterView.OnItem
         adaptador.notifyDataSetChanged();
 
 
+
+        //return nombreArticles;
+
+
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        //Si tenim un resultat correcte tornant de qualsevol de les 2 activitats, reiniciem aquesta activitat
+        //perque volem refrescar la GUI
         if (RESULT_OK == resultCode) {
-            if (requestCode == REQ_MOSTRAR) {
-                Intent refresh = new Intent(this, LlistaItems.class);
-                startActivity(refresh);
-                this.finish();
-
-            }
-
+            Intent refresh = new Intent(this, LlistaItems.class);
+            startActivity(refresh);
+            this.finish();
 
         }
-
-
     }
+
+    //Mètode per començar l'actiivat d'afegir articles
+    public void cridaAfegir() {
+        Intent intent = new Intent(this, Afegir.class);
+        //startActivity(intent);
+        startActivityForResult(intent, REQ_AFEGIR);
+    }
+
 }
 
 

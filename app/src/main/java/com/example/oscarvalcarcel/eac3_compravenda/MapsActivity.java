@@ -72,7 +72,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions().position(posicio).title("Fes click al marcador per acceptar")).showInfoWindow();
 
         //Afegim la camera amb nivell de zoom i la desplacem a la posició que hem creat
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(posicio, 19));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(posicio, 16));
 
         //Afegin un listener per al marcador
         mMap.setOnMarkerClickListener(this);

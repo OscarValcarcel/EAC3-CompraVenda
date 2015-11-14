@@ -21,8 +21,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.UUID;
@@ -57,7 +55,7 @@ public class Afegir extends AppCompatActivity implements LocationListener {
         posicio = (ImageButton) findViewById(R.id.posicio);
         db = new DBInterface(this);
 
-
+        //ELIMINAR TRAS APP OK!!!!//////////////////////////////////////////////
         final Button comprobar = (Button) findViewById(R.id.comprobar);
         comprobar.setOnClickListener(new View.OnClickListener() {
              @Override
@@ -120,6 +118,8 @@ public class Afegir extends AppCompatActivity implements LocationListener {
 
     }
 
+
+    ///ELIMINAR TRAS APP OK!!!!!!!!!!//////////////////////////////////////
     public void comprobaDB() {
         Intent dbmanager = new Intent(this, AndroidDatabaseManager.class);
         startActivity(dbmanager);
@@ -154,19 +154,15 @@ public class Afegir extends AppCompatActivity implements LocationListener {
 
                 db.obre();
                 //db.esborraTaula();
-                db.insereixArticle(textTitol, textPreu, textDescripcio, identificadorFoto.toString(), location.toString());
+                db.insereixArticle(textTitol, textPreu, textDescripcio, identificadorFoto.toString(), String.valueOf(location.getLongitude()),String.valueOf(location.getLatitude()));
                 Toast.makeText(this, "Article inserit correctament", Toast.LENGTH_SHORT).show();
                 db.tanca();
 
-                //Creem un intent per arrancar l'activitat de LlistarItems
-                Intent i = new Intent(this,LlistaItems.class);
+                //Establim que el resultat és OK
+                setResult(RESULT_OK, null);
 
-                //Possem la location en el intent
-                i.putExtra("location", location);
-
-                //Arranquem l'activitat de LlistarItems
-                startActivity(i);
-                //finish();
+                //Finalitzem l'activitat
+                finish();
 
             }
 
@@ -195,6 +191,7 @@ public class Afegir extends AppCompatActivity implements LocationListener {
                     // Reduïm la imatge per no tenir problemes de visualització.
                     int height = (bitmap.getHeight() * 800 / bitmap.getWidth());
                     Bitmap resized = Bitmap.createScaledBitmap(bitmap, 800, height, true);
+                    //Bitmap resized = Bitmap.createScaledBitmap(bitmap, 450, 1000, true);
 
                     // Guardem el Bitmap generat
                     FileOutputStream stream = new FileOutputStream(identificadorFoto.toString().replace("file://", ""));
@@ -202,8 +199,15 @@ public class Afegir extends AppCompatActivity implements LocationListener {
                     stream.flush();
                     stream.close();
 
+                    /*Matrix matrix = new Matrix();
+                    matrix.postRotate(90);
+                    Bitmap rotated = Bitmap.createBitmap(resized, 0, 0,
+                            resized.getWidth(), resized.getHeight(),
+                            matrix, true);*/
+
                     // L'assignem a l'ImageView
                     imatge.setImageBitmap(resized);
+                    //imatge.setRotation(90);
                 } catch (Exception e) {
                     Toast.makeText(this, "No es pot carregar la imatge" +
                                     identificadorFoto.toString(),
@@ -220,10 +224,10 @@ public class Afegir extends AppCompatActivity implements LocationListener {
                         posicio.getBackground().setColorFilter(Color.rgb(204, 255, 204), PorterDuff.Mode.MULTIPLY);
                     }
 
-                    String text = "Posició actual:\n" +
+                    /*String text = "Posició actual:\n" +
                             "Latitud " + location.getLatitude() + "\n" +
                             "Longitud " + location.getLongitude();
-                    Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();*/
 
 
                 }
