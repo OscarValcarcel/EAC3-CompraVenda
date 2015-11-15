@@ -30,17 +30,17 @@ import java.util.UUID;
 public class Afegir extends AppCompatActivity implements LocationListener {
 
 
-    private ImageView imatge;                                      //ImageView per visualitzar la foto que fem. També activarà la càmera
-    private EditText titol;                                        //EditText per possar el titol del article que es vol vendre
-    private EditText preu;                                         //EditText per possar el preu del article que es vol vendre
-    private EditText descripcio;
-    private ImageButton posicio;                                   //ImageButton que polsarem per trobar la nostra geolocalització
-    private static final int REQ_CAMERA = 0;               //Constant amb el número que identifica l'activitat de l'aplicació de fotos
-    private static final int REQ_MAP = 1;                  //Constant amb el número que identifica l'activitat de Google Maps
-    private Location location;                                     //Variable que desarà la nostra localització.
-    private Uri identificadorFoto = null;                                 //Variable del tipus URI que guardarà l'identificador del arxiu
-    private Bitmap bitmap;
-    private DBInterface db;
+    private ImageView imatge;                             //ImageView per visualitzar la foto que fem. També activarà la càmera
+    private EditText titol;                               //EditText per possar el titol del article que es vol vendre
+    private EditText preu;                                //EditText per possar el preu del article que es vol vendre
+    private EditText descripcio;                          //EditText per possar la descripció del article que es vol vendre
+    private ImageButton posicio;                          //ImageButton que polsarem per trobar la nostra geolocalització
+    private static final int REQ_CAMERA = 0;              //Constant amb el número que identifica l'activitat de l'aplicació de fotos
+    private static final int REQ_MAP = 1;                 //Constant amb el número que identifica l'activitat de Google Maps
+    private Location location;                            //Variable que desarà la nostra localització.
+    private Uri identificadorFoto = null;                 //Variable del tipus URI que guardarà l'identificador del arxiu
+    private Bitmap bitmap;                                //Bitmap de la foto
+    private DBInterface db;                               //Objecte de base de Dades
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,47 +60,50 @@ public class Afegir extends AppCompatActivity implements LocationListener {
         //ELIMINAR TRAS APP OK!!!!//////////////////////////////////////////////
         final Button comprobar = (Button) findViewById(R.id.comprobar);
         comprobar.setOnClickListener(new View.OnClickListener() {
-             @Override
-             public void onClick(View v) {
-             comprobaDB();
-             }
+            @Override
+            public void onClick(View v) {
+                comprobaDB();
+            }
         });
 
 
-                //Establim un listener per al botó per quan fem click
-                posicio.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        //cridem al mètode que obra l'activitat de maps i canviem el color de fons del botó
-                        cridaMapa();
+        //Establim un listener per al botó per quan fem click
+        posicio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //cridem al mètode que obre l'activitat de maps i canviem el color de fons del botó
+                cridaMapa();
 
 
-                    }
-                });
+            }
+        });
 
-
+        //Establim un listener per al ImageView per quan fem click sobre aquest
         imatge.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int imageNum = 0;
-
+                //Creem un intent i un File i marquem la ruta on volem desar els articles
                 Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                 File items = new File(android.os.Environment.getExternalStorageDirectory().toString() + "/Items/");
 
-                //Si la carpeta no existeix la creem
+                //Si el directori no existeix el creem
                 if (!items.exists()) {
                     items.mkdir();
                 }
 
+                //Generem una cadena unica per al nom de la foto
                 String nomFoto = UUID.randomUUID().toString() + ".jpg";
+
                 //Creem el fitxer per a la foto que farem. Passem com a paràmetre el directori on volem desar-la i el nom
                 File fitxerFoto = new File(items, nomFoto);
 
                 //Passem a l'Intent el fitxer per a que sàpiga on ha de desar la foto
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(fitxerFoto));
 
+                //Obtenim el Uri desde el arxiu
                 identificadorFoto = Uri.fromFile(fitxerFoto);
-                //String path =   items.getAbsolutePath();
+
+                //Iniciem l'activitat de camera
                 startActivityForResult(intent, REQ_CAMERA);
 
 
@@ -129,14 +132,10 @@ public class Afegir extends AppCompatActivity implements LocationListener {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-
-        //Intent dbmanager = new Intent(this,AndroidDatabaseManager.class);
-        //startActivity(dbmanager);
+        //desem el identificador del item del menu que s'ha seleccionat
         int id = item.getItemId();
 
+        //
         String textTitol = titol.getText().toString();
         String textPreu = preu.getText().toString();
         String textDescripcio = descripcio.getText().toString();
@@ -159,13 +158,15 @@ public class Afegir extends AppCompatActivity implements LocationListener {
 
                 return true;
 
-            } else {
-                //LatLng latlng = new LatLng(location.getLatitude(),location.getLongitude());
 
+                //Per al contrari
+            } else {
+
+                //Obrim la nostra base de dades i inserim l'article corresponent.
                 db.obre();
-                //db.esborraTaula();
-                db.insereixArticle(textTitol, textPreu, textDescripcio, identificadorFoto.toString(), String.valueOf(location.getLongitude()),String.valueOf(location.getLatitude()));
-                Toast.makeText(this, "Article inserit correctament", Toast.LENGTH_SHORT).show();
+                db.insereixArticle(textTitol, textPreu, textDescripcio, identificadorFoto.toString(), String.valueOf(location.getLongitude()), String.valueOf(location.getLatitude()));
+
+                //Tanquem la BD
                 db.tanca();
 
                 //Establim que el resultat és OK
@@ -190,8 +191,10 @@ public class Afegir extends AppCompatActivity implements LocationListener {
 
         //Si tot ha sortit bé
         if (RESULT_OK == resultCode) {
+            //I el codi de request coincideix amb el que hem utiliztzat per llançar l'activitat de camera
             if (requestCode == REQ_CAMERA) {
 
+                //Obtenim un Content Resolver i li passem el nostre uri
                 ContentResolver contRes = getContentResolver();
                 contRes.notifyChange(identificadorFoto, null);
 
@@ -200,9 +203,7 @@ public class Afegir extends AppCompatActivity implements LocationListener {
 
                     // Reduïm la imatge per no tenir problemes de visualització.
                     int height = (bitmap.getHeight() * 800 / bitmap.getWidth());
-                    //Bitmap resized = Bitmap.createScaledBitmap(bitmap, 800, height, true);
                     Bitmap resized = Bitmap.createScaledBitmap(bitmap, 300, 300, true);
-                    //Bitmap resized = Bitmap.createScaledBitmap(bitmap, 350, 700, true);
 
                     // Guardem el Bitmap generat
                     FileOutputStream stream = new FileOutputStream(identificadorFoto.toString().replace("file://", ""));
@@ -210,15 +211,9 @@ public class Afegir extends AppCompatActivity implements LocationListener {
                     stream.flush();
                     stream.close();
 
-                    /*Matrix matrix = new Matrix();
-                    matrix.postRotate(90);
-                    Bitmap rotated = Bitmap.createBitmap(resized, 0, 0,
-                            resized.getWidth(), resized.getHeight(),
-                            matrix, true);*/
-
                     // L'assignem a l'ImageView
                     imatge.setImageBitmap(resized);
-                    //imatge.setRotation(90);
+
                 } catch (Exception e) {
                     Toast.makeText(this, "No es pot carregar la imatge" +
                                     identificadorFoto.toString(),
@@ -234,11 +229,6 @@ public class Afegir extends AppCompatActivity implements LocationListener {
                     if (location != null) {
                         posicio.getBackground().setColorFilter(Color.rgb(204, 255, 204), PorterDuff.Mode.MULTIPLY);
                     }
-
-                    /*String text = "Posició actual:\n" +
-                            "Latitud " + location.getLatitude() + "\n" +
-                            "Longitud " + location.getLongitude();
-                    Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();*/
 
 
                 }
