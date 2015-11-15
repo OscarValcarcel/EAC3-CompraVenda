@@ -11,6 +11,8 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingTop="0dp"
+        android:layout_marginTop="0dp"
         android:orientation="vertical">
 
         <fragment
@@ -18,7 +20,8 @@
             class="com.google.android.gms.maps.MapFragment"
             android:layout_width="match_parent"
             android:layout_height="170dp"
-            android:scaleType="fitCenter" />
+            android:scaleType="fitCenter"
+            android:layout_marginTop="0dp"/>
 
         <TextView
             android:id="@+id/descripcio"

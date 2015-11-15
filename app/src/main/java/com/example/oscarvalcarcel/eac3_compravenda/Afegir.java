@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +20,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -145,8 +147,16 @@ public class Afegir extends AppCompatActivity implements LocationListener {
             //Si no tenim totes les dades complertes
             if ((location == null) || (textTitol.equals("")) || (textPreu.equals("")) || (textDescripcio.equals("")) || (bitmap == null)) {
 
-                //Avisem amb un Toast
-                Toast.makeText(this, "Completa totes les dades!", Toast.LENGTH_SHORT).show();
+                //Avisem amb un Toast personalitzat
+                Toast toast = Toast.makeText(this, "Completa totes les dades!", Toast.LENGTH_SHORT);
+                View toastview = toast.getView();
+                TextView toastMessage = (TextView) toastview.findViewById(android.R.id.message);
+                toastMessage.setCompoundDrawablesWithIntrinsicBounds(R.drawable.shop_mini, 0, 0, 0);
+                toastMessage.setGravity(Gravity.LEFT);
+                toastMessage.setCompoundDrawablePadding(15);
+                toast.show();
+
+
                 return true;
 
             } else {
@@ -190,12 +200,13 @@ public class Afegir extends AppCompatActivity implements LocationListener {
 
                     // Reduïm la imatge per no tenir problemes de visualització.
                     int height = (bitmap.getHeight() * 800 / bitmap.getWidth());
-                    Bitmap resized = Bitmap.createScaledBitmap(bitmap, 800, height, true);
-                    //Bitmap resized = Bitmap.createScaledBitmap(bitmap, 450, 1000, true);
+                    //Bitmap resized = Bitmap.createScaledBitmap(bitmap, 800, height, true);
+                    Bitmap resized = Bitmap.createScaledBitmap(bitmap, 300, 300, true);
+                    //Bitmap resized = Bitmap.createScaledBitmap(bitmap, 350, 700, true);
 
                     // Guardem el Bitmap generat
                     FileOutputStream stream = new FileOutputStream(identificadorFoto.toString().replace("file://", ""));
-                    resized.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                    resized.compress(Bitmap.CompressFormat.JPEG, 90, stream);
                     stream.flush();
                     stream.close();
 

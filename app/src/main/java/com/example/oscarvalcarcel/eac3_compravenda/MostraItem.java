@@ -62,7 +62,7 @@ public class MostraItem extends AppCompatActivity {
 
 
         //Canviem el titol de l'activitat
-        setTitle(titol + "-" + preu + " €");
+        setTitle(titol + "-" + preu + "€");
 
         //Posem la descripció al TextView
         textview.setText(descripcio);
@@ -77,6 +77,10 @@ public class MostraItem extends AppCompatActivity {
         try {
             //Obtenim un bitmap a travès del ContentResolver i el Uri
             Bitmap bitmap = android.provider.MediaStore.Images.Media.getBitmap(contRes, uri);
+
+            //int height = (bitmap.getHeight() * 800 / bitmap.getWidth());
+            //Bitmap resized = Bitmap.createScaledBitmap(bitmap, 800, height, true);
+            //Bitmap resized = Bitmap.createScaledBitmap(bitmap, 730, , true);
 
             //Establim la nostra imatge
             imageview.setImageBitmap(bitmap);
